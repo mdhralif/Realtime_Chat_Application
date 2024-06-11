@@ -80,8 +80,7 @@ const AddUser = () => {
                 setMessage("User is already in the chat list.");
             }
         } catch (err) {
-            console.log(err);
-            setMessage("Error occurred while adding user.");
+            console.log(err);   
         }
     };
 

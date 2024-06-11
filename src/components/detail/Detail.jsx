@@ -35,7 +35,7 @@ const Detail =() =>{
             <div className="user">
                 <img src={user?.avatar || "./avatar.png"} alt="" />
                 <h2>{user?.username}</h2>
-                <p>Description</p>
+                <p>Hey,There!</p>
 
             </div>
             <div className="info">
