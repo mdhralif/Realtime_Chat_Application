@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword ,signInWithEmailAndPassword} from "firebase/auth";
 import { auth,db } from "../../lib/firebase";
 import { doc,setDoc } from "firebase/firestore";
-import { update } from "firebase/database";
 import upload from "../../lib/upload";
 
 const Login =() =>{
@@ -26,39 +25,46 @@ const Login =() =>{
         }
     };
 
-    const handleRegister =async(e) =>{
+    const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const formData=new FormData(e.target);
-
-        const{username,email,password}=Object.fromEntries(formData);
-        
-        try{
-            const res=await createUserWithEmailAndPassword(auth,email,password);
-
-            const imgUrl=await upload(avatar.file);
-
-            await setDoc(doc(db,"users",res.user.uid),{
+        const formData = new FormData(e.target);
+    
+        const { username, email, password } = Object.fromEntries(formData);
+    
+        // Check if avatar file is not null
+        if (!avatar.file) {
+            setLoading(false);
+            toast.error("Please upload an image.");
+            return;
+        }
+    
+        try {
+            const res = await createUserWithEmailAndPassword(auth, email, password);
+    
+            const imgUrl = await upload(avatar.file);
+    
+            await setDoc(doc(db, "users", res.user.uid), {
                 username,
                 email,
-                avatar:imgUrl,
-                id:res.user.uid,
-                blocked:[]
+                avatar: imgUrl,
+                id: res.user.uid,
+                blocked: []
             });
-
-            await setDoc(doc(db,"userchats",res.user.uid),{
-                chats:[],
+    
+            await setDoc(doc(db, "userchats", res.user.uid), {
+                chats: [],
             });
-
-
-            toast.success("Account Created! You can login now!")
-        }catch(err){
+    
+            toast.success("Account Created! You can login now!");
+        } catch (err) {
             console.log(err);
             toast.error(err.message);
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
+    
 
     const handleLogin =async(e) =>{
         e.preventDefault();
@@ -100,7 +106,7 @@ const Login =() =>{
                         <input type="text" placeholder="Email" name="email"/>
                         <input type="password" placeholder="Password" name="password"/>
                         <button disabled={loading}>{loading ? "Loading" :"Sign In"}</button>
-                        <label onClick={handleCreateAccountClick}>Don't have an account?</label>
+                        <label onClick={handleCreateAccountClick}>Don&apos;t have an account?</label>
                     </form>
                 </div>
             )}
@@ -126,3 +132,4 @@ const Login =() =>{
     );
 };
 export default Login;
+/*Done*/

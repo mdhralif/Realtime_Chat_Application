@@ -12,7 +12,6 @@ const Userinfo =() =>{
                 <h2>{currentUser.username}</h2>
             </div>
             <div className="icons">
-                <img src="./edit.png" alt="" />
                 <img src="./signOut.png" className="logout" onClick={()=>auth.signOut()}/>
             </div>
         </div>

@@ -37,36 +37,57 @@ const AddUser = () => {
     };
 
     const handleAdd = async (user) => {
+        // Prevent adding the current user to their own chat list
+        if (user.id === currentUser.id) {
+            setMessage("Can't add yourself to your own chat list.");
+            return;
+        }
+    
         const userChatsRef = collection(db, "userchats");
         const currentUserChatsDocRef = doc(userChatsRef, currentUser.id);
-
+    
         try {
             // Fetch the current user's chat list
             const currentUserChatsDoc = await getDoc(currentUserChatsDocRef);
-            const currentUserChats = currentUserChatsDoc.exists() ? currentUserChatsDoc.data().chats : [];
-
-            // Check if the user is already in the chat list
-            const alreadyAdded = currentUserChats.some(chat => chat.receiverId === user.id);
-
-            if (!alreadyAdded) {
-                const chatRef = collection(db, "chats");
-                const newChatRef = doc(chatRef);
-
-                await setDoc(newChatRef, {
-                    createdAt: serverTimestamp(),
-                    messages: [],
-                });
-
-                await updateDoc(currentUserChatsDocRef, {
-                    chats: arrayUnion({
-                        chatId: newChatRef.id,
-                        lastMessage: "",
-                        receiverId: user.id,
-                        updatedAt: Date.now(),
-                    }),
-                });
-
-                await updateDoc(doc(userChatsRef, user.id), {
+            const currentUserChats = currentUserChatsDoc.exists ? currentUserChatsDoc.data().chats : [];
+    
+            // Check if there's an existing chat with the user
+            const existingChatIndex = currentUserChats.findIndex(chat => chat.receiverId === user.id);
+    
+            if (existingChatIndex !== -1) {
+                setMessage("User is already in the chat list.");
+                return;
+            }
+    
+            // Create a new chat document only if no existing chat is found
+            const chatRef = collection(db, "chats");
+            const newChatRef = doc(chatRef);
+    
+            await setDoc(newChatRef, {
+                createdAt: serverTimestamp(),
+                messages: [],
+            });
+    
+            // Update current user's `userchats` document
+            await updateDoc(currentUserChatsDocRef, {
+                chats: arrayUnion({
+                    chatId: newChatRef.id,
+                    lastMessage: "",
+                    receiverId: user.id,
+                    updatedAt: Date.now(),
+                }),
+            });
+    
+            // Update selected user's `userchats` document
+            const selectedUserChatsDocRef = doc(userChatsRef, user.id);
+            const selectedUserChatsDoc = await getDoc(selectedUserChatsDocRef);
+            const selectedUserChats = selectedUserChatsDoc.exists ? selectedUserChatsDoc.data().chats : [];
+    
+            // Check if there's already an entry in recipient's `userchats`
+            const existingRecipientChatIndex = selectedUserChats.findIndex(chat => chat.receiverId === currentUser.id);
+    
+            if (existingRecipientChatIndex === -1) {
+                await updateDoc(selectedUserChatsDocRef, {
                     chats: arrayUnion({
                         chatId: newChatRef.id,
                         lastMessage: "",
@@ -74,16 +95,16 @@ const AddUser = () => {
                         updatedAt: Date.now(),
                     }),
                 });
-
-                setMessage("User added successfully!");
-            } else {
-                setMessage("User is already in the chat list.");
             }
+    
+            setMessage("User added successfully!");
         } catch (err) {
-            console.log(err);   
+            console.error(err);
+            
         }
     };
-
+    
+    
     return (
         <div className='addUser'>
             <form onSubmit={handleSearch}>

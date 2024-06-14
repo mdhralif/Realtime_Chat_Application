@@ -7,7 +7,7 @@ import "./detail.css"
 
 const Detail =() =>{
 
-    const {chatId,user,isCurrentUserBlocked,isReceiverBlocked,changeBlock} =
+    const {user,isCurrentUserBlocked,isReceiverBlocked,changeBlock} =
         useChatStore();
 
     const {currentUser} = useUserStore();
@@ -52,20 +52,7 @@ const Detail =() =>{
                     </div>
                 </div>
                 <div className="option">
-                    <div className="title">
-                        <span>Shared photos</span>
-                        <img src="./arrowDown.png" alt="" />
-                    </div>
-                    <div className="photos">
-                        <div className="photoItem">
-                            <div className="photoDetail">
-                                <img src="./bg.jpg" alt="" />
-                                <span>photo_2024.png</span>
-                            </div>
-                            <img src="./download.png" alt="" className="icon"/>
-                        </div>  
-                          
-                    </div>
+                    
                 </div>
                 <button onClick={handleBlock}>
                     {isCurrentUserBlocked 

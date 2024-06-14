@@ -73,6 +73,8 @@ const ChatList = () => {
                     return rest;
                 }),
             });
+
+            // Update local state with filtered chats
             setChats(filteredChats);
         } catch (err) {
             console.log(err);
@@ -91,6 +93,7 @@ const ChatList = () => {
                     <input
                         type="text"
                         placeholder="Search"
+                        value={input}
                         onChange={(e) => setInput(e.target.value)} 
                     />
                 </div>
@@ -114,10 +117,7 @@ const ChatList = () => {
                     key={chat.chatId}
                     onClick={() => handleSelect(chat)}
                     style={{
-                        padding: "20px",
-                        cursor: "pointer",
-                        borderBottom: "1px solid #dddddd35",
-                        position: "relative"
+                        backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
                     }}
                 >
                     <img
@@ -142,9 +142,25 @@ const ChatList = () => {
                             setMenuVisible(chat.chatId === menuVisible ? null : chat.chatId);
                         }}
                     />
-                   {menuVisible === chat.chatId && (
-                        <div className="context-menu" style={{ position: "absolute", top: "0", right: "0", backgroundColor: "white", border: "1px solid #ccc", borderRadius: "5px", padding: "2px", zIndex: "1" }} onClick={(e) => e.stopPropagation()}>
-                        <button className="delete-btn" style={{ backgroundColor: "#ff4d4d", color: "white", border: "none", padding: "5px 5px", borderRadius: "3px", cursor: "pointer", width: "auto", display: "inline-block", textAlign: "center" }} onClick={() => handleDelete(chat.chatId)}>Remove User</button>
+                    {menuVisible === chat.chatId && (
+                        <div className="item-context-menu">
+                            <div className="context-menu" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    className="delete-btn"
+                                    style={{
+                                        backgroundColor: "#ff4d4d",
+                                        color: "white",
+                                        border: "none",
+                                        padding: "5px 10px",
+                                        borderRadius: "3px",
+                                        cursor: "pointer",
+                                        textAlign: "center",
+                                    }}
+                                    onClick={() => handleDelete(chat.chatId)}
+                                >
+                                    Remove User
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
